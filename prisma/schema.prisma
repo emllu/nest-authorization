@@ -19,3 +19,16 @@ model data {
   email    String @unique
   password String
 }
+
+model refreshtoken {
+  id         Int      @id @default(autoincrement())
+  token      String
+  userid     Int @unique
+  expiredate DateTime
+}
+model resettoken {
+  id         Int      @id @default(autoincrement())
+  token      String
+  userid     Int @unique
+  expiredate DateTime
+}

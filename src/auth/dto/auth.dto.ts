@@ -12,3 +12,13 @@ export  class AuthDto{
 
     password:string
 }
+export class ChangePassword{
+    @IsString()
+    oldpassword:string
+ 
+    @IsString()
+    @MinLength(6)
+    @Matches(/^(?=.*\d)/, { message: 'Password must contain at least one number' })
+
+    newpassword:string
+}
