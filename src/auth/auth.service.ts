@@ -67,7 +67,7 @@ export class AuthService {
   }
 
   async refresh(dto: RefreshDto) {
-    // Find the refresh token in the database
+    // Find the refresh token in the database/
     const refresh = await this.prisma.refreshtoken.findFirst({
       where: {
         token: dto.token,
@@ -118,7 +118,7 @@ export class AuthService {
       },
     });
   }
-  //change password
+  //change passwordgjr
   async changepassword(dto:ChangePassword,userid:number){
     //checking if user exists
     const user= await this.prisma.data.findFirst({
@@ -148,32 +148,46 @@ id:userid
     return {msg:"password changed successfully"}
   }
   //forgot password
-async forgotpassword(dto:ResetDto){
-  //checking if user exist
-  const user=await this.prisma.data.findFirst({
-    where:{
-      email:dto.email
+  async forgotpassword(dto: ResetDto) {
+    // Check if the user exists
+    const user = await this.prisma.data.findFirst({
+      where: {
+        email: dto.email
+      }
+    });
+  
+    if (user) {
+      const resettoken = uuidv4();
+      const expiredate = new Date();
+      expiredate.setHours(expiredate.getHours() + 1);
+  
+      // Upsert the reset token
+      await this.prisma.resettoken.upsert({
+        where: {
+          userid: user.id // This assumes `userid` is used as the unique identifier
+        },
+        update: {
+          token: resettoken,
+          expiredate: expiredate
+        },
+        create: {
+          token: resettoken,
+          userid: user.id,
+          expiredate: expiredate
+        }
+      });
+  
+      return { reseturl: `http://localhost:3000/auth/reset-password:${resettoken}` };
     }
-  }) 
-  if(user){
- const resettoken= uuidv4()
- const expiredate=new Date()
- expiredate.setHours(expiredate.getHours()+1)
- await this.prisma.resettoken.create({
-  data:{
-    token:resettoken,
-    userid:user.id,
-    expiredate:expiredate
+    
+    else{
+      return "you will recive in your email"
+    }
   }
+  
 
- })
- return { reseturl:`http://localhost:3000/auth/reset-password:${resettoken}`}
-  }
-else{
-  return "you will recive in your email"
-}
  
-}
+
 //reset-password
 
  async resetpassword(dto: Reset) {

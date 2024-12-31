@@ -10,3 +10,6 @@ export class Users {
     @Matches(/^(?=.*\d)/, { message: 'Password must contain at least one number' })
     password: string;
 }
+
+
+  
